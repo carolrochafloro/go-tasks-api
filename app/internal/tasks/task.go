@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-type Task struct {
+type TaskT struct {
 	Id          string `bson:"task_id,omitempty"`
 	Title       string `bson:"title,omitempty"`
 	Deadline    string `bson:"deadline,omitempty"`
 	IsCompleted bool   `bson:"is_completed,omitempty"`
 }
 
-func (t *Task) Validade() error {
+func (t *TaskT) Validade() error {
 
 	if len(t.Title) < 3 {
 		return errors.New("task title must have at least 3 characters")

@@ -6,16 +6,16 @@ import (
 	"strings"
 )
 
-type User struct {
+type UserT struct {
 	Id        string `bson:"_id,omitempty"`
 	Email     string `bson:"email,omitempty"`
 	Password  string `bson:"password,omitempty"`
 	FirstName string `bson:"first_name,omitempty"`
 	LastName  string `bson:"last_name,omitempty"`
-	Tasks []tasks.Task `bson:"tasks,omitempty"`    
+	Tasks []tasks.TaskT `bson:"tasks,omitempty"`    
 }
 
-func (u *User) Validate() error {
+func (u *UserT) Validate() error {
 
 	if !strings.Contains(u.Email, "@") || len(u.Email) < 4 {
 		return errors.New("this email is not valid")
@@ -27,5 +27,7 @@ func (u *User) Validate() error {
 
 	return nil
 }
+
+
 
 
