@@ -29,7 +29,7 @@ func (h *HTTPServiceT) AddEndpoint(endpoint string, f func(http.ResponseWriter, 
 	h.routeMux.HandleFunc(endpoint, f)
 }
 
-func (h *HTTPServiceT) StartServer(add, port string) {
+func (h *HTTPServiceT) StartServer() {
 	
 	for route, handler := range Routes {
 		h.AddEndpoint(route, handler)
