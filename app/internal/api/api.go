@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 var HTTPService *HTTPServiceT
 
 // routeMux: ponteiro para instância do ServeMux. criado struct para receber as funções correspondentes.
 type HTTPServiceT struct {
-	routeMux *http.ServeMux
+	router *mux.Router
 }
 
 func NewHTTPService() {
@@ -19,14 +21,14 @@ func NewHTTPService() {
 	// se HTTPService não tiver sido inicializado, inicia um
 	if HTTPService == nil {
 		HTTPService = &HTTPServiceT{
-			routeMux: http.NewServeMux(),
+			router: mux.NewRouter(),
 		}
 	}
 }
 
 // adicionar novos endpoints ao serviço recebendo a rota e o handler correspondente
 func (h *HTTPServiceT) AddEndpoint(endpoint string, f func(http.ResponseWriter, *http.Request)) {
-	h.routeMux.HandleFunc(endpoint, f)
+	h.router.HandleFunc(endpoint, f)
 }
 
 func (h *HTTPServiceT) StartServer() {
@@ -39,7 +41,7 @@ func (h *HTTPServiceT) StartServer() {
 		Addr: os.Getenv("BASE_URL"),
 		ReadTimeout: 60 * time.Second,
 		WriteTimeout: 60 * time.Second,
-		Handler: h.routeMux,
+		Handler: h.router,
 	}
 
 	logging.Info("Starting HTTP server:", os.Getenv("BASE_URL"))
