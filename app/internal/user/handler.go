@@ -12,12 +12,9 @@ import (
 
 var client *mongo.Client
 
-func init() {
-
-
-}
-
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+
+	logging.Info("User handler was pinged.")
 
 	client, err := db.NewDbService()
 
@@ -44,4 +41,5 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	logging.Info("User handler was pinged.")
 }
