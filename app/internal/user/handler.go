@@ -7,30 +7,27 @@ import (
 	"go-tasks-api/app/internal/logging"
 	"net/http"
 
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var client *mongo.Client
 
 func init() {
-	err := godotenv.Load()
 
-	if err != nil {
-		logging.Warn("Failed to load .env file.", err)
-	}
 
-	client, err = db.NewDbService()
+}
+
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+
+	client, err := db.NewDbService()
 
 	if err != nil {
 		logging.Warn("Failed to connect to MongoDB", err)
 	}
-}
 
-func CreateUser(w http.ResponseWriter, r http.Request) {
 	user := UserT{}
 
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err = json.NewDecoder(r.Body).Decode(&user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

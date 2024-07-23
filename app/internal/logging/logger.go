@@ -4,20 +4,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 var Logger *log.Logger
 
 func NewLogger() {
 
-	err := godotenv.Load()
-
-	if err != nil {
-		fmt.Println("Unable to load environment variables.")
-		os.Exit(1)
-	}
 	logFile, err := os.OpenFile(os.Getenv("LOG_FILE"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
 	if err != nil {

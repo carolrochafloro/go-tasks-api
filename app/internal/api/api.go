@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 var HTTPService *HTTPServiceT
@@ -32,8 +30,6 @@ func (h *HTTPServiceT) AddEndpoint(endpoint string, f func(http.ResponseWriter, 
 }
 
 func (h *HTTPServiceT) StartServer(add, port string) {
-
-	logging.NewLogger()
 	
 	for route, handler := range Routes {
 		h.AddEndpoint(route, handler)
@@ -54,16 +50,6 @@ func (h *HTTPServiceT) StartServer(add, port string) {
 		logging.Error("Unable to start server")
 		panic(err)
 	}
-}
-
-func init() {
-	err := godotenv.Load()
-
-	if err != nil {
-		logging.Error("Failed to load .env file.")
-		panic(err)
-	}
-
 }
 
 

@@ -43,7 +43,7 @@ func NewDbService() (*mongo.Client, error) {
 				logging.Warn("Failed to disconnect from MongoDB:", err)
 			}
 		}()
-
+ 
 	return client, nil
 
 }
