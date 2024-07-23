@@ -5,24 +5,17 @@ import (
 	"go-tasks-api/app/internal/logging"
 	"os"
 
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewDbService() (*mongo.Client, error) {
 
-	err := godotenv.Load()
 
-	if err != nil {
-		logging.Logger.Fatal("Unable to open environment variables:", err)
-	}
-
-	uri := os.Getenv("MONGO_URI")
+	uri:= os.Getenv("MONGO_URI")
 
 	if uri == "" {
 		logging.Warn("Mongo URI is not set up.")
-		return nil, err
 	}
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
