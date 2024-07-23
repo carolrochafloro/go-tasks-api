@@ -14,7 +14,6 @@ var (
 	MainCancel  context.CancelFunc
 )
 
-
 func New() {
 
 	MainContext, MainCancel = context.WithCancel(context.Background())
@@ -28,7 +27,11 @@ func New() {
 		logging.Warn("Unable to load environment variables.")
 	}
 
-	db.NewDbService()
+	_, err = db.NewDbService()
+	if err != nil {
+		logging.Error("Failed to initialize DB service:", err)
+	}
+
 	api.NewHTTPService()
 	api.HTTPService.StartServer()
 
