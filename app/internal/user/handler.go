@@ -6,40 +6,51 @@ import (
 	"go-tasks-api/app/internal/db"
 	"go-tasks-api/app/internal/logging"
 	"net/http"
-
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var client *mongo.Client
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	logging.Info("User handler was pinged.")
+	if r.Header.Get("Content-Type") != "application/json" {
+        http.Error(w, "Content type is not application/json", http.StatusUnsupportedMediaType)
+        return
+    }
 
-	client, err := db.NewDbService()
+	if r.Body == nil {
+        http.Error(w, "Request body is missing", http.StatusBadRequest)
+        return
+    }
 
-	if err != nil {
-		logging.Warn("Failed to connect to MongoDB", err)
-	}
+	defer r.Body.Close()
 
 	user := UserT{}
 
-	err = json.NewDecoder(r.Body).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		logging.Warn("Wrong content.")
 		return
 	}
 
+	err = user.Validate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logging.Warn("Validation failed", err)
+		return
+	}
+
+	client := db.Client
+
 	collection := client.Database("go-tasks").Collection("users")
 
-	_, err = collection.InsertOne(context.TODO(), user)
+	result, err := collection.InsertOne(context.TODO(), user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logging.Warn("Unable to insert user.")
+		println(result)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	logging.Info("User handler was pinged.")
 }
