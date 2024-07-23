@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var Client *mongo.Client
+
 func NewDbService() (*mongo.Client, error) {
 
 
@@ -31,13 +33,9 @@ func NewDbService() (*mongo.Client, error) {
 		return nil, err
 	}
 
-	defer func() {
-			if err := client.Disconnect(context.TODO()); err != nil {
-				logging.Warn("Failed to disconnect from MongoDB:", err)
-			}
-		}()
+	Client = client
  
 	return client, nil
-
 }
 
+// criar função para desconectar
