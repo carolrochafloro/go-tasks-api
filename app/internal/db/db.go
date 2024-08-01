@@ -5,6 +5,7 @@ import (
 	"go-tasks-api/app/internal/logging"
 	"os"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -13,6 +14,8 @@ var Client *mongo.Client
 
 func NewDbService() (*mongo.Client, error) {
 
+	godotenv.Load()
+	
 	uri:= os.Getenv("MONGO_URI")
 
 	if uri == "" {

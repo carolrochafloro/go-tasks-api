@@ -42,7 +42,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, userExists := getUser(user.Email, "email", client)
+	_, userExists := getUser(user.Email, "email")
 
 	if userExists {
 		w.WriteHeader(http.StatusConflict) // Status 409 Conflict, pois o usuário já existe
@@ -50,7 +50,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addUserToDB(user, client)
+	addUserToDB(user)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User created."))
@@ -61,7 +61,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     id := vars["id"]
 
-	user, found := getUser(id, "_id", client)
+	user, found := getUser(id, "_id")
 	
 	if !found {
 		w.WriteHeader(http.StatusNotFound) // Status 409 Conflict, pois o usuário já existe

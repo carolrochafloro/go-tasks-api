@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"go-tasks-api/app/internal/db"
 	"go-tasks-api/app/internal/logging"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -9,7 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func getUser(s, key string, client *mongo.Client) (UserT, bool) {
+func getUser(s, key string) (UserT, bool) {
+
+	client := db.Client
 
 	if client == nil {
 		logging.Error("MongoDB client is nil")
@@ -43,7 +46,9 @@ func getUser(s, key string, client *mongo.Client) (UserT, bool) {
 	return user, true
 }
 
-func addUserToDB(u UserT, client *mongo.Client) {
+func addUserToDB(u UserT) {
+
+	client := db.Client
 
 	collection := client.Database("go-tasks").Collection("users")
 
