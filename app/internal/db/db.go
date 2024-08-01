@@ -13,7 +13,6 @@ var Client *mongo.Client
 
 func NewDbService() (*mongo.Client, error) {
 
-
 	uri:= os.Getenv("MONGO_URI")
 
 	if uri == "" {

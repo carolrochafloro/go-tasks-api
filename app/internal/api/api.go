@@ -2,6 +2,7 @@ package api
 
 import (
 	"go-tasks-api/app/internal/logging"
+	"go-tasks-api/app/internal/user"
 	"net/http"
 	"os"
 	"time"
@@ -14,10 +15,10 @@ var HTTPService *HTTPServiceT
 // routeMux: ponteiro para instância do ServeMux. criado struct para receber as funções correspondentes.
 type HTTPServiceT struct {
 	router *mux.Router
+
 }
 
 func NewHTTPService() {
-
 	// se HTTPService não tiver sido inicializado, inicia um
 	if HTTPService == nil {
 		HTTPService = &HTTPServiceT{
@@ -26,16 +27,10 @@ func NewHTTPService() {
 	}
 }
 
-// adicionar novos endpoints ao serviço recebendo a rota e o handler correspondente
-func (h *HTTPServiceT) AddEndpoint(endpoint string, f func(http.ResponseWriter, *http.Request)) {
-	h.router.HandleFunc(endpoint, f)
-}
-
 func (h *HTTPServiceT) StartServer() {
 	
-	for route, handler := range Routes {
-		h.AddEndpoint(route, handler)
-	}
+	h.router.HandleFunc("/user/new", user.CreateUser).Methods("POST")
+	h.router.HandleFunc("/user/{id}", user.GetUserById).Methods("GET")
 
 	server := &http.Server{
 		Addr: os.Getenv("BASE_URL"),

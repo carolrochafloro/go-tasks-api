@@ -4,10 +4,12 @@ import (
 	"errors"
 	"go-tasks-api/app/internal/tasks"
 	"strings"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserT struct {
-	Id        string `bson:"_id,omitempty"`
+	Id        primitive.ObjectID `bson:"_id,omitempty"`
 	Email     string `bson:"email,omitempty"`
 	Password  string `bson:"password,omitempty"`
 	FirstName string `bson:"first_name,omitempty"`

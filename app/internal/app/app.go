@@ -23,11 +23,13 @@ func New() {
 	logging.Info("Starting server...")
 
 	err := godotenv.Load()
+	
 	if err != nil {
 		logging.Warn("Unable to load environment variables.")
 	}
 
 	_, err = db.NewDbService()
+
 	if err != nil {
 		logging.Error("Failed to initialize DB service:", err)
 	}
