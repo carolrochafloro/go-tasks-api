@@ -31,6 +31,7 @@ func (h *HTTPServiceT) StartServer() {
 	
 	h.router.HandleFunc("/user/new", user.CreateUser).Methods("POST")
 	h.router.HandleFunc("/user/{id}", user.GetUserById).Methods("GET")
+	h.router.HandleFunc("/user/{id}", user.DeleteUser).Methods("DELETE")
 
 	server := &http.Server{
 		Addr: os.Getenv("BASE_URL"),
