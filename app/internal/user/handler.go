@@ -2,14 +2,12 @@ package user
 
 import (
 	"encoding/json"
-	"go-tasks-api/app/internal/db"
+	"fmt"
 	"go-tasks-api/app/internal/logging"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
-
-var client = db.Client
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
@@ -76,4 +74,27 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(user); err != nil {
 		http.Error(w, "Failed to encode user to JSON", http.StatusInternalServerError)
 	}
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request){
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	_, found := getUser(id, "_id")
+
+	if !found {
+		http.Error(w, "This user doesn't exist.", http.StatusNotFound)
+		return
+	}
+
+	result, err := deleteUserService(id)
+
+	if err != nil {
+		http.Error(w, "Failed to delete user.", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(fmt.Sprintf("Deleted %d user(s)", result.DeletedCount)))
 }

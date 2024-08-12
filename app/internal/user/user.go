@@ -23,11 +23,11 @@ func (u *UserT) Validate() error {
 	result := regexp.MustCompile(emailRegex)
 
 	if !result.MatchString(u.Email) {
-		return errors.New("This email is not valid")
+		return errors.New("this email is not valid")
 	}
 
 	if len(u.FirstName) < 3 || len(u.LastName) < 3 {
-		return errors.New("Name and last name must be at least 3 characters long")
+		return errors.New("name and last name must be at least 3 characters long")
 	}
 
 	return nil
