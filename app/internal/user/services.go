@@ -20,23 +20,20 @@ func getUser(s, key string) (UserT, bool) {
 	}
 
 	collection := client.Database("go-tasks").Collection("users")
-	println("Test", s)
 	
 	var filter interface{}
 
 	// converter id para ObjectId caso a busca seja por OId
 	if key == "_id" {
 
-		objectID, err := primitive.ObjectIDFromHex(s)
-		if err != nil {
-			logging.Error("Invalid ObjectID format", err)
-			return UserT{}, false
-		}
-		filter = bson.M{key: objectID}
+		object := convertStringToId(s)
+		filter = bson.M{key: object}
+
 	} else {
+
 		filter = bson.M{key: s}
 	}
-
+	
 	var user UserT
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 
@@ -59,4 +56,35 @@ func addUserToDB(u UserT) {
 		println(result)
 		return
 	}
+}
+
+func deleteUserService(s string) (*mongo.DeleteResult, error) {
+	client := db.Client
+
+	collection := client.Database("go-tasks").Collection("users")
+
+	objectID := convertStringToId(s)
+
+	filter := bson.D{{Key: "_id", Value: objectID}}
+
+	result, err := collection.DeleteOne(context.TODO(), filter)
+	
+		if (err != nil) {
+			logging.Error("Unable to delete user.", err)
+		}
+
+	return result, nil
+
+}
+
+func convertStringToId(s string) (primitive.ObjectID) {
+
+	objectID, err := primitive.ObjectIDFromHex(s)
+
+	if err != nil {
+		logging.Error("Error on converting string to ObjectId", err)
+	}
+
+	return objectID
+
 }
