@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("User already exists"))
 		return
 	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		logging.Error("There was an error on hashing the password.", err)
+	}
+
+	user.Password = string(hashedPassword)
 
 	addUserToDB(user)
 
