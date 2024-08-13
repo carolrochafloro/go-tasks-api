@@ -7,7 +7,7 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/app/cmd/main.go",
-      "env": {},
+      "envFile": "${workspaceFolder}/.env",
       "args": []
     }
   ]
