@@ -9,12 +9,12 @@ import (
 )
 
 type UserT struct {
-	Id        primitive.ObjectID `bson:"_id,omitempty"`
-	Email     string `bson:"email,omitempty"`
-	Password  string `bson:"password,omitempty"`
-	FirstName string `bson:"first_name,omitempty"`
-	LastName  string `bson:"last_name,omitempty"`
-	Tasks []tasks.TaskT `bson:"tasks,omitempty"`    
+    Id        primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
+    Email     string             `bson:"email,omitempty" json:"email,omitempty"`
+    Password  string             `bson:"password,omitempty" json:"password,omitempty"`
+    FirstName string             `bson:"first_name,omitempty" json:"first_name,omitempty"`
+    LastName  string             `bson:"last_name,omitempty" json:"last_name,omitempty"`
+    Tasks     []tasks.TaskT      `bson:"tasks,omitempty" json:"tasks,omitempty"`
 }
 
 func (u *UserT) Validate() error {

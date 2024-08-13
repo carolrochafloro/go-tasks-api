@@ -88,3 +88,41 @@ func convertStringToId(s string) (primitive.ObjectID) {
 	return objectID
 
 }
+
+func updateUser(s string, u UserT) (*mongo.UpdateResult) {
+
+	client := db.Client
+
+	objectID := convertStringToId(s)
+
+	collection := client.Database("go-tasks").Collection("users")
+	filter := bson.D{{Key: "_id", Value: objectID}}
+
+	updateFields := bson.D{}
+
+	if u.Email != "" {
+		updateFields = append(updateFields, bson.E{Key: "email", Value: u.Email})
+	}
+	if u.Password != "" {
+		updateFields = append(updateFields, bson.E{Key: "password", Value: u.Password})
+	}
+	if u.FirstName != "" {
+		updateFields = append(updateFields, bson.E{Key: "first_name", Value: u.FirstName})
+	}
+	if u.LastName != "" {
+		updateFields = append(updateFields, bson.E{Key: "last_name", Value: u.LastName})
+	}
+
+	update := bson.D{
+		{Key: "$set", Value: updateFields},
+	}
+
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	
+	if err != nil {
+		logging.Error("There whas an error on updating the user", err)
+	}
+
+	return result
+
+}

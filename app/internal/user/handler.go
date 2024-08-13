@@ -98,3 +98,49 @@ func DeleteUser(w http.ResponseWriter, r *http.Request){
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Deleted %d user(s)", result.DeletedCount)))
 }
+
+func EditProfile(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	
+	if r.Header.Get("Content-Type") != "application/json" {
+        http.Error(w, "Content type is not application/json", http.StatusUnsupportedMediaType)
+        return
+    }
+
+	if r.Body == nil {
+        http.Error(w, "Request body is missing", http.StatusBadRequest)
+        return
+    }
+
+	defer r.Body.Close()
+
+	user := UserT{}
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logging.Warn("Wrong content.")
+		return
+	}
+
+	_, found := getUser(id, "_id")
+
+	if !found {
+		http.Error(w, "This user doesn't exist.", http.StatusNotFound)
+		return
+	}
+
+	result := updateUser(id, user)
+
+	if (result.ModifiedCount < 1) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(fmt.Sprintf("Updated %d user(s)", result.ModifiedCount)))
+
+}
