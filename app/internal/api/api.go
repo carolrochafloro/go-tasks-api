@@ -2,6 +2,7 @@ package api
 
 import (
 	"go-tasks-api/app/internal/logging"
+	"go-tasks-api/app/internal/login"
 	"go-tasks-api/app/internal/user"
 	"net/http"
 	"os"
@@ -33,6 +34,7 @@ func (h *HTTPServiceT) StartServer() {
 	h.router.HandleFunc("/user/{id}", user.GetUserById).Methods("GET")
 	h.router.HandleFunc("/user/{id}", user.DeleteUser).Methods("DELETE")
 	h.router.HandleFunc("/user/{id}", user.EditProfile).Methods("PUT")
+	h.router.HandleFunc("/login", login.Login).Methods("POST")
 
 	server := &http.Server{
 		Addr: os.Getenv("BASE_URL"),
