@@ -10,39 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func getUser(s, key string) (UserT, bool) {
-
-	client := db.Client
-
-	if client == nil {
-		logging.Error("MongoDB client is nil")
-		return UserT{}, false
-	}
-
-	collection := client.Database("go-tasks").Collection("users")
-	
-	var filter interface{}
-
-	// converter id para ObjectId caso a busca seja por OId
-	if key == "_id" {
-
-		object := convertStringToId(s)
-		filter = bson.M{key: object}
-
-	} else {
-
-		filter = bson.M{key: s}
-	}
-	
-	var user UserT
-	err := collection.FindOne(context.TODO(), filter).Decode(&user)
-
-	if err == mongo.ErrNoDocuments {
-		return UserT{}, false
-	}
-	return user, true
-}
-
 func addUserToDB(u UserT) error {
 
 	client := db.Client

@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"go-tasks-api/app/internal/logging"
 	"go-tasks-api/app/internal/utils"
 	"net/http"
@@ -43,13 +42,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
         return
 	}
 
-	res, err := utils.GetByKey(user.Email, "email", "users")
+	var existingUser UserT
+	err = utils.GetByKey(user.Email, "email", "users", &existingUser)
 	if err != nil {
         utils.RespondWithError(w, http.StatusInternalServerError, "Database error")
         logging.Error("Error querying database: ", err)
         return
     }
-	if res != nil {
+	
+	if existingUser.Email != "" {
         utils.RespondWithError(w, http.StatusConflict, "User already exists")
         logging.Warn("User already exists: ", user.Email)
         return
@@ -81,30 +82,25 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
     id := vars["id"]
 
-	res, err:= utils.GetByKey(id, "_id", "users")
+	var user UserT
 
-	if res == nil || err != nil {
+	err:= utils.GetByKey(id, "_id", "users", &user)
+
+	if err != nil {
 		logging.Error("Unable to get user", err)
-		w.WriteHeader(http.StatusNotFound) // Status 409 Conflict, pois o usuário já existe
-		w.Write([]byte("This user doesn't exist."))
+		utils.RespondWithError(w, http.StatusNotFound, "User not found.")
 		return
 	}
 
-	user, ok := res.(UserT)
-
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Unable to read User."))
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK) // Status 200 OK
 
 	// Codificar o usuário em JSON
 	if err := json.NewEncoder(w).Encode(user); err != nil {
-		http.Error(w, "Failed to encode user to JSON", http.StatusInternalServerError)
+		logging.Error("Unable to encode user", err)
+		utils.RespondWithError(w, http.StatusInternalServerError, "Unable to encode user.")
+		return
 	}
+
+	utils.RespondWithJSON(w, http.StatusFound, user)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request){
@@ -112,22 +108,25 @@ func DeleteUser(w http.ResponseWriter, r *http.Request){
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	_, found := getUser(id, "_id")
+	var user UserT
 
-	if !found {
-		http.Error(w, "This user doesn't exist.", http.StatusNotFound)
-		return
-	}
-
-	result, err := deleteUserService(id)
+	err := utils.GetByKey(id, "_id", "users", &user)
 
 	if err != nil {
-		http.Error(w, "Failed to delete user.", http.StatusInternalServerError)
+		logging.Error("This user doesn't exist.")
+		utils.RespondWithError(w, http.StatusNotFound, "User not found.")
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Deleted %d user(s)", result.DeletedCount)))
+	_, err = deleteUserService(id)
+
+	if err != nil {
+		logging.Error("Failed to delete user.", err)
+		utils.RespondWithError(w, http.StatusBadGateway, "Failed to delete user.")
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, "User was deleted.")
 }
 
 func EditProfile(w http.ResponseWriter, r *http.Request) {
@@ -157,21 +156,24 @@ func EditProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, found := getUser(id, "_id")
+	var existingUser UserT
 
-	if !found {
-		http.Error(w, "This user doesn't exist.", http.StatusNotFound)
+	err = utils.GetByKey(id, "_id", "users", &existingUser)
+
+	if err != nil {
+		logging.Error("User not found.")
+		utils.RespondWithError(w, http.StatusNotFound, "User not found.")
 		return
 	}
 
 	result := updateUser(id, user)
 
 	if (result.ModifiedCount < 1) {
-		w.WriteHeader(http.StatusBadRequest)
+		logging.Error("No changes were performed.")
+		utils.RespondWithError(w, http.StatusBadGateway, "Unable to update user.")
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Updated %d user(s)", result.ModifiedCount)))
+	utils.RespondWithJSON(w, http.StatusOK, "The user was updated.")
 
 }

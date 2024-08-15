@@ -3,7 +3,6 @@ package utils
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"go-tasks-api/app/internal/db"
 	"go-tasks-api/app/internal/logging"
 	"net/http"
@@ -14,13 +13,13 @@ import (
 )
 
 
-func GetByKey(s, key, col string) (interface{}, error) {
+func GetByKey(s, key, col string, result interface{}) error {
 
 	client := db.Client
 
 	if client == nil {
 		logging.Error("MongoDB client is nil")
-		return nil, errors.New("MongoDB client is nil")
+		return nil
 	}
 
 	collection := client.Database("go-tasks").Collection(col)
@@ -43,19 +42,17 @@ func GetByKey(s, key, col string) (interface{}, error) {
 
 	}
 
-	var result interface{}
-
-	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	err := collection.FindOne(context.TODO(), filter).Decode(result)
 
 	if err != nil {
 		if (err == mongo.ErrNoDocuments) {
-			return nil, nil
+			return nil
 		}
-
-		return nil, err
+		logging.Error("Error finding document.", err)
+		return nil
 	}
 
-	return result, nil
+	return nil
 	
 }
 
