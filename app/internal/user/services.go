@@ -43,7 +43,7 @@ func getUser(s, key string) (UserT, bool) {
 	return user, true
 }
 
-func addUserToDB(u UserT) {
+func addUserToDB(u UserT) error {
 
 	client := db.Client
 
@@ -54,8 +54,10 @@ func addUserToDB(u UserT) {
 	if err != nil {
 		logging.Warn("Unable to insert user.")
 		println(result)
-		return
+		return err
 	}
+
+	return nil
 }
 
 func deleteUserService(s string) (*mongo.DeleteResult, error) {
